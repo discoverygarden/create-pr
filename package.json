@@ -1,0 +1,38 @@
+{
+  "name": "create-pr",
+  "version": "1.0.0",
+  "description": "GitHub action to create and merges pull requests.",
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "tsc",
+    "package": "ncc build --source-map",
+    "lint": "eslint src/**/*.ts",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/discoverygarden/create-pr.git"
+  },
+  "author": "discoverygarden",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/discoverygarden/create-pr/issues"
+  },
+  "homepage": "https://github.com/discoverygarden/create-pr#readme",
+  "dependencies": {
+    "@actions/core": "^1.7.0",
+    "@actions/github": "^5.0.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.5.0",
+    "@typescript-eslint/eslint-plugin": "^5.22.0",
+    "@typescript-eslint/parser": "^5.22.0",
+    "@vercel/ncc": "^0.33.4",
+    "eslint": "^8.14.0",
+    "eslint-plugin-jest": "^26.1.5",
+    "jest": "^28.0.3",
+    "prettier": "2.6.2",
+    "ts-jest": "^28.0.1",
+    "typescript": "^4.6.4"
+  }
+}
