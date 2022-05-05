@@ -5,7 +5,6 @@ export async function run() {
   try {
     const { title, autoMerge, token, ...pullLocation } = getParams();
 
-    core.warning(JSON.stringify(pullLocation))
     const octokit = github.getOctokit(token);
     const { data: openPrs } = await octokit.rest.pulls.list({
       ...pullLocation,
@@ -27,6 +26,7 @@ export async function run() {
       }));
     }
 
+    core.info(`Created pull request: ${newPr.html_url}`);
     core.setOutput("number", newPr.number);
     core.setOutput("url", newPr.html_url);
 

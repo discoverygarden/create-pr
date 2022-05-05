@@ -57,7 +57,6 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const _a = getParams(), { title, autoMerge, token } = _a, pullLocation = __rest(_a, ["title", "autoMerge", "token"]);
-            core.warning(JSON.stringify(pullLocation));
             const octokit = github.getOctokit(token);
             const { data: openPrs } = yield octokit.rest.pulls.list(Object.assign(Object.assign({}, pullLocation), { state: "open" }));
             if (openPrs.length > 0) {
@@ -68,6 +67,7 @@ function run() {
             while (newPr.mergeable === null) {
                 ({ data: newPr } = yield octokit.rest.pulls.get(Object.assign(Object.assign({}, pullLocation), { pull_number: newPr.number })));
             }
+            core.info(`Created pull request: ${newPr.html_url}`);
             core.setOutput("number", newPr.number);
             core.setOutput("url", newPr.html_url);
             if (!autoMerge) {
