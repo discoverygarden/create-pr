@@ -31,10 +31,12 @@ export async function run() {
     core.setOutput("url", newPr.html_url);
 
     if (!autoMerge) {
+      core.info("Auto merge is disabled the pull request will not be merged.");
       return;
     }
     if (newPr.mergeable) {
       octokit.rest.pulls.merge({ ...pullLocation, pull_number: newPr.number });
+      core.info("Merged pull request.");
     } else {
       core.setFailed(
         `Can not merge pull request state is ${newPr.mergeable_state}.`
