@@ -46,7 +46,7 @@ export async function run() {
 }
 
 function getParams() {
-  const [owner, repo] = core.getInput("repo", { required: true });
+  const [owner, repo] = core.getInput("repo", { required: true }).split("/");
   return {
     title: core.getInput("title", { required: true }),
     owner: owner,
