@@ -57,7 +57,7 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const _a = getParams(), { title, autoMerge, token } = _a, pullLocation = __rest(_a, ["title", "autoMerge", "token"]);
-            core.warning(title);
+            core.warning(JSON.stringify(pullLocation));
             const octokit = github.getOctokit(token);
             const { data: openPrs } = yield octokit.rest.pulls.list(Object.assign(Object.assign({}, pullLocation), { state: "open" }));
             if (openPrs.length > 0) {
