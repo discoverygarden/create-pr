@@ -11,7 +11,7 @@ export async function run() {
       state: "open",
     });
     if (openPrs.length > 0) {
-      core.info("Pull request already exists.");
+      core.info(`Pull request already exists: ${openPrs[0].html_url}`);
       return;
     }
 
