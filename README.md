@@ -7,9 +7,10 @@ Workflow for creating and automatically merging pull requests.
 
 ### Inputs
 
-- `repo`: Repository name with owner, defaults to current.
-- `head`: Head branch to merge, deafults to current branch.
-- `base`: Base branch to merge into.
+- `repo`: Repository name with owner. Defaults to current repository or its parent if it's a fork.
+- `head`: Head branch to merge. Defaults to the current branch. If creating a pull request against a parent repo prefix the branch name with `${{ owner }}:`
+- `base`: Base branch to merge into. Defaults to the default branch the of the current repos or it's parent if it is a fork. 
+
 - `automerge`: True if the pull request should be mergd automatically, default to `true`.
 - `token`: GitHub access token.
 
@@ -36,4 +37,4 @@ jobs:
           base: main
           automerge: false
           token: ${{ secrets.GITHUB_TOKEN}}
-```
+```qq
