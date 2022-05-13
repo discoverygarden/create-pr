@@ -1,4 +1,4 @@
-import { run } from "../src/index";
+import { run, getParams } from "../src/index";
 import * as github from "@actions/github";
 import * as core from "@actions/core";
 
@@ -13,8 +13,7 @@ const mergePullMock = jest.spyOn(octokit.rest.pulls, "merge");
 jest.mock("@actions/core");
 const inputs: { [key: string]: string } = {
   title: "Pull Request",
-  owner: "username",
-  repo: "myrepo",
+  repo: "username/myrepo",
   head: "head-branch",
   base: "base-branch",
   token: "_",
@@ -101,4 +100,30 @@ test("do not merge if not mergeable", async () => {
   await run();
 
   expect(mergePullMock).not.toBeCalled();
+});
+
+test("prepends owner to head if missing", () => {
+  const inputs: { [key: string]: string } = {
+    repo: "username/repo",
+    head: "head-branch",
+  };
+  jest
+    .spyOn(core, "getInput")
+    .mockImplementation((id: string, ...params) => id in inputs ? inputs[id] : "-");
+
+
+  expect( getParams().head).toEqual("username:head-branch");
+});
+
+test("does not prepend owner to head if present", () => {
+  const inputs: { [key: string]: string } = {
+    repo: "username/repo",
+    head: "username:head-branch",
+  };
+  jest
+    .spyOn(core, "getInput")
+    .mockImplementation((id: string, ...params) => id in inputs ? inputs[id] : "-");
+
+
+  expect( getParams().head).toEqual("username:head-branch");
 });

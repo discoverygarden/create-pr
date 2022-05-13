@@ -47,13 +47,17 @@ export async function run() {
   }
 }
 
-function getParams() {
+export function getParams() {
   const [owner, repo] = core.getInput("repo", { required: true }).split("/");
+  let head = core.getInput("head", { required: true });
+  if (!head.includes(":")) {
+    head = `${owner}:${head}`
+  }
   return {
     title: core.getInput("title", { required: true }),
     owner: owner,
     repo: repo,
-    head: core.getInput("head", { required: true }),
+    head: head,
     base: core.getInput("base", { required: true }),
     autoMerge: core.getBooleanInput("automerge", { required: true }),
     token: core.getInput("token", { required: true }),
