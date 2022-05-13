@@ -50,17 +50,18 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.run = void 0;
+exports.getParams = exports.run = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const _a = getParams(), { title, autoMerge, token } = _a, pullLocation = __rest(_a, ["title", "autoMerge", "token"]);
+            core.debug(JSON.stringify(pullLocation));
             const octokit = github.getOctokit(token);
             const { data: openPrs } = yield octokit.rest.pulls.list(Object.assign(Object.assign({}, pullLocation), { state: "open" }));
             if (openPrs.length > 0) {
-                core.info("Pull request already exists.");
+                core.info(`Pull request already exists: ${openPrs[0].html_url}`);
                 return;
             }
             let { data: newPr } = yield octokit.rest.pulls.create(Object.assign(Object.assign({}, pullLocation), { title: title }));
@@ -91,16 +92,21 @@ function run() {
 exports.run = run;
 function getParams() {
     const [owner, repo] = core.getInput("repo", { required: true }).split("/");
+    let head = core.getInput("head", { required: true });
+    if (!head.includes(":")) {
+        head = `${owner}:${head}`;
+    }
     return {
         title: core.getInput("title", { required: true }),
         owner: owner,
         repo: repo,
-        head: core.getInput("head", { required: true }),
+        head: head,
         base: core.getInput("base", { required: true }),
         autoMerge: core.getBooleanInput("automerge", { required: true }),
         token: core.getInput("token", { required: true }),
     };
 }
+exports.getParams = getParams;
 run();
 
 
