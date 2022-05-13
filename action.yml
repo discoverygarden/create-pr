@@ -6,13 +6,13 @@ inputs:
     required: true
   repo:
     description: Repository name with owner. (owner/repo)
-    default: ${{ github.event.repository.parent.full_name }}
+    default: ${{ github.repository }}
   head:
     description: Head branch to merge.
-    default: "${{ github.repository_owner }}:${{ github.ref_name }}"
+    default: ${{ github.ref }}
   base:
     description: Base branch to merge into.
-    default: ${{ github.event.repository.parent.default_branch }}
+    default: ${{ github.event.repository.default_branch }}
   automerge:
     description: True if the pull request should be mergd automatically.
     default: true
