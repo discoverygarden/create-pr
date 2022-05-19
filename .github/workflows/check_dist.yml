@@ -1,5 +1,5 @@
 
-name: Test
+name: Check Dist
 on:
   pull_request:
     branches: ['*']
@@ -16,7 +16,7 @@ jobs:
       - run: npm ci
       - run: npm run package
       - run: |
-          if [[ $(git status --porcelain )]]; then
+          if [[ $(git status --porcelain) ]]; then
             echo 
             echo '::error ::`dist` changed, please update dist by running `npm run package`'
           fi
