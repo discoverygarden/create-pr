@@ -13,7 +13,7 @@ inputs:
   base:
     description: Base branch to merge into.
     default: ${{ github.event.repository.default_branch }}
-  Labels:
+  labels:
     description: A comma seperated list of labels to add to the pull request.
   automerge:
     description: True if the pull request should be mergd automatically.
