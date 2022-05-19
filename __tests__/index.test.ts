@@ -48,71 +48,74 @@ beforeEach(() => {
   jest.clearAllMocks();
 });
 
-test("exits after existing pr", async () => {
-  listPullsMock.mockResolvedValue(<any>{ data: [null] });
+describe("run", () => {
+  it("exits after existing pr", async () => {
+    listPullsMock.mockResolvedValue(<any>{ data: [null] });
 
-  await run();
+    await run();
 
-  expect(createPullMock).not.toBeCalled();
-  expect(getPullMock).not.toBeCalled();
-});
+    expect(createPullMock).not.toBeCalled();
+    expect(getPullMock).not.toBeCalled();
+  });
 
-test("waits to see if mergable", async () => {
-  listPullsMock.mockResolvedValue(<any>{ data: [] });
-  createPullMock.mockResolvedValue(<any>unknownPull);
-  getPullMock.mockReturnValueOnce(<any>unknownPull);
-  getPullMock.mockReturnValueOnce(<any>mergablePull);
+  it("waits to see if mergable", async () => {
+    listPullsMock.mockResolvedValue(<any>{ data: [] });
+    createPullMock.mockResolvedValue(<any>unknownPull);
+    getPullMock.mockReturnValueOnce(<any>unknownPull);
+    getPullMock.mockReturnValueOnce(<any>mergablePull);
 
-  await run();
+    await run();
 
-  expect(createPullMock).toBeCalled();
-  expect(getPullMock).toBeCalledTimes(2);
-});
+    expect(createPullMock).toBeCalled();
+    expect(getPullMock).toBeCalledTimes(2);
+  });
 
-test("merge if mergeable and auto merge enabled", async () => {
-  listPullsMock.mockResolvedValue(<any>{ data: [] });
-  createPullMock.mockResolvedValue(<any>unknownPull);
-  getPullMock.mockReturnValueOnce(<any>mergablePull);
-  jest.spyOn(core, "getBooleanInput").mockReturnValue(true);
+  it("merge if mergeable and auto merge enabled", async () => {
+    listPullsMock.mockResolvedValue(<any>{ data: [] });
+    createPullMock.mockResolvedValue(<any>unknownPull);
+    getPullMock.mockReturnValueOnce(<any>mergablePull);
+    jest.spyOn(core, "getBooleanInput").mockReturnValue(true);
 
-  await run();
+    await run();
 
-  expect(mergePullMock).toBeCalled();
-});
+    expect(mergePullMock).toBeCalled();
+  });
 
-test("do not merge if mergeable and auto merge disabled", async () => {
-  listPullsMock.mockResolvedValue(<any>{ data: [] });
-  createPullMock.mockResolvedValue(<any>unknownPull);
-  getPullMock.mockReturnValueOnce(<any>mergablePull);
-  jest.spyOn(core, "getBooleanInput").mockReturnValue(false);
+  it("do not merge if mergeable and auto merge disabled", async () => {
+    listPullsMock.mockResolvedValue(<any>{ data: [] });
+    createPullMock.mockResolvedValue(<any>unknownPull);
+    getPullMock.mockReturnValueOnce(<any>mergablePull);
+    jest.spyOn(core, "getBooleanInput").mockReturnValue(false);
 
-  await run();
+    await run();
 
-  expect(mergePullMock).not.toBeCalled();
-});
+    expect(mergePullMock).not.toBeCalled();
+  });
 
-test("do not merge if not mergeable", async () => {
-  listPullsMock.mockResolvedValue(<any>{ data: [] });
-  createPullMock.mockResolvedValue(<any>unknownPull);
-  getPullMock.mockReturnValueOnce(<any>dirtyPull);
-  jest.spyOn(core, "getBooleanInput").mockReturnValue(true);
+  it("do not merge if not mergeable", async () => {
+    listPullsMock.mockResolvedValue(<any>{ data: [] });
+    createPullMock.mockResolvedValue(<any>unknownPull);
+    getPullMock.mockReturnValueOnce(<any>dirtyPull);
+    jest.spyOn(core, "getBooleanInput").mockReturnValue(true);
 
-  await run();
+    await run();
 
-  expect(mergePullMock).not.toBeCalled();
-});
+    expect(mergePullMock).not.toBeCalled();
+  });
 
-test("prepends owner to head if missing", () => {
-  const inputs: { [key: string]: string } = {
-    repo: "username/repo",
-    head: "head-branch",
-  };
-  jest
-    .spyOn(core, "getInput")
-    .mockImplementation((id: string, ...params) => id in inputs ? inputs[id] : "-");
+  it("prepends owner to head if missing", () => {
+    const inputs: { [key: string]: string } = {
+      repo: "username/repo",
+      head: "head-branch",
+    };
+    jest
+      .spyOn(core, "getInput")
+      .mockImplementation((id: string, ...params) =>
+        id in inputs ? inputs[id] : "-"
+      );
 
-
-  expect( getParams().head).toEqual("username:head-branch");
+    expect(getParams().head).toEqual("username:head-branch");
+  });
 });
 
 test("does not prepend owner to head if present", () => {
@@ -122,8 +125,9 @@ test("does not prepend owner to head if present", () => {
   };
   jest
     .spyOn(core, "getInput")
-    .mockImplementation((id: string, ...params) => id in inputs ? inputs[id] : "-");
+    .mockImplementation((id: string, ...params) =>
+      id in inputs ? inputs[id] : "-"
+    );
 
-
-  expect( getParams().head).toEqual("username:head-branch");
+  expect(getParams().head).toEqual("username:head-branch");
 });
