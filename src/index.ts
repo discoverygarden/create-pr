@@ -36,7 +36,7 @@ export async function run() {
 
       )
     } else {
-      core.debug("No to add")
+      core.debug("No labels to add")
     }
 
     while (newPr.mergeable === null) {
