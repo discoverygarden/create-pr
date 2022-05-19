@@ -102,7 +102,9 @@ describe("run", () => {
 
     expect(mergePullMock).not.toBeCalled();
   });
+});
 
+describe("getParams", () => {
   it("prepends owner to head if missing", () => {
     const inputs: { [key: string]: string } = {
       repo: "username/repo",
@@ -116,18 +118,18 @@ describe("run", () => {
 
     expect(getParams().head).toEqual("username:head-branch");
   });
-});
 
-test("does not prepend owner to head if present", () => {
-  const inputs: { [key: string]: string } = {
-    repo: "username/repo",
-    head: "username:head-branch",
-  };
-  jest
-    .spyOn(core, "getInput")
-    .mockImplementation((id: string, ...params) =>
-      id in inputs ? inputs[id] : "-"
-    );
+  it("does not prepend owner to head if present", () => {
+    const inputs: { [key: string]: string } = {
+      repo: "username/repo",
+      head: "username:head-branch",
+    };
+    jest
+      .spyOn(core, "getInput")
+      .mockImplementation((id: string, ...params) =>
+        id in inputs ? inputs[id] : "-"
+      );
 
-  expect(getParams().head).toEqual("username:head-branch");
+    expect(getParams().head).toEqual("username:head-branch");
+  });
 });
