@@ -10,6 +10,7 @@ Workflow for creating and automatically merging pull requests.
 - `repo`: Repository name with owner. Defaults to current.
 - `head`: Head branch to merge. Deafults to current branch.
 - `base`: Base branch to merge into. Defaults to the current repo's default branch.
+- `labels`: A comma seperated list of labels to add to the pull request.
 - `automerge`: True if the pull request should be mergd automatically, default to `true`.
 - `token`: GitHub access token.
 

@@ -9,6 +9,7 @@ const listPullsMock = jest.spyOn(octokit.rest.pulls, "list");
 const createPullMock = jest.spyOn(octokit.rest.pulls, "create");
 const getPullMock = jest.spyOn(octokit.rest.pulls, "get");
 const mergePullMock = jest.spyOn(octokit.rest.pulls, "merge");
+const addLabelsMock = jest.spyOn(octokit.rest.issues, "addLabels");
 
 jest.mock("@actions/core");
 const inputs: { [key: string]: string } = {
@@ -17,6 +18,7 @@ const inputs: { [key: string]: string } = {
   head: "head-branch",
   base: "base-branch",
   token: "_",
+  labels: "label 1, label 2"
 };
 jest
   .spyOn(core, "getInput")
@@ -102,6 +104,21 @@ describe("run", () => {
 
     expect(mergePullMock).not.toBeCalled();
   });
+
+  it("adds labels to the pull request when labels added", async () => {
+    listPullsMock.mockResolvedValue(<any>{ data: [] });
+    createPullMock.mockResolvedValue(<any>{ data: { number: 1 } });
+
+    await run();
+
+    expect(addLabelsMock).toBeCalledTimes(1);
+    expect(addLabelsMock).toBeCalledWith({
+      owner: "username",
+      repo: "myrepo",
+      issue_number: 1,
+      labels: ["label 1", "label 2"],
+    });
+  });
 });
 
 describe("getParams", () => {
@@ -131,5 +148,18 @@ describe("getParams", () => {
       );
 
     expect(getParams().head).toEqual("username:head-branch");
+  });
+
+  it("returns a list of labels from the comma seperated string of labels provided", () => {
+    const inputs: { [key: string]: string } = {
+      labels: "label 1, label 2",
+    };
+    jest
+      .spyOn(core, "getInput")
+      .mockImplementation((id: string, ...params) =>
+        id in inputs ? inputs[id] : "-"
+      );
+
+    expect(getParams().labels).toEqual(["label 1", "label 2"]);
   });
 });

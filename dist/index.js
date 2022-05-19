@@ -56,7 +56,7 @@ const github = __importStar(__nccwpck_require__(5438));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const _a = getParams(), { title, autoMerge, token } = _a, pullLocation = __rest(_a, ["title", "autoMerge", "token"]);
+            const _a = getParams(), { title, autoMerge, token, labels } = _a, pullLocation = __rest(_a, ["title", "autoMerge", "token", "labels"]);
             core.debug(JSON.stringify(pullLocation));
             const octokit = github.getOctokit(token);
             const { data: openPrs } = yield octokit.rest.pulls.list(Object.assign(Object.assign({}, pullLocation), { state: "open" }));
@@ -71,6 +71,18 @@ function run() {
             core.info(`Created pull request: ${newPr.html_url}`);
             core.setOutput("number", newPr.number);
             core.setOutput("url", newPr.html_url);
+            if (labels.length > 0) {
+                core.debug(`Adding labels ${labels} to ${newPr.html_url}`);
+                octokit.rest.issues.addLabels({
+                    owner: pullLocation.owner,
+                    repo: pullLocation.repo,
+                    issue_number: newPr.number,
+                    labels: labels,
+                });
+            }
+            else {
+                core.debug("No labels to add");
+            }
             if (!autoMerge) {
                 core.info("Auto merge is disabled the pull request will not be merged.");
                 return;
@@ -93,6 +105,7 @@ exports.run = run;
 function getParams() {
     const [owner, repo] = core.getInput("repo", { required: true }).split("/");
     let head = core.getInput("head", { required: true });
+    const labels = core.getInput("labels").split(",").map((l) => { return l.trim(); });
     if (!head.includes(":")) {
         head = `${owner}:${head}`;
     }
@@ -104,6 +117,7 @@ function getParams() {
         base: core.getInput("base", { required: true }),
         autoMerge: core.getBooleanInput("automerge", { required: true }),
         token: core.getInput("token", { required: true }),
+        labels: labels,
     };
 }
 exports.getParams = getParams;

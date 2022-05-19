@@ -3,7 +3,7 @@ import * as github from "@actions/github";
 
 export async function run() {
   try {
-    const { title, autoMerge, token, ...pullLocation } = getParams();
+    const { title, autoMerge, token, labels, ...pullLocation } = getParams();
     core.debug(JSON.stringify(pullLocation))
 
     const octokit = github.getOctokit(token);
@@ -31,6 +31,20 @@ export async function run() {
     core.setOutput("number", newPr.number);
     core.setOutput("url", newPr.html_url);
 
+    if (labels.length > 0) {
+      core.debug(`Adding labels ${labels} to ${newPr.html_url}`)
+      octokit.rest.issues.addLabels({
+        owner: pullLocation.owner,
+        repo: pullLocation.repo,
+        issue_number: newPr.number,
+        labels: labels,
+      }
+
+      )
+    } else {
+      core.debug("No labels to add")
+    }
+
     if (!autoMerge) {
       core.info("Auto merge is disabled the pull request will not be merged.");
       return;
@@ -51,6 +65,9 @@ export async function run() {
 export function getParams() {
   const [owner, repo] = core.getInput("repo", { required: true }).split("/");
   let head = core.getInput("head", { required: true });
+
+  const labels = core.getInput("labels").split(",").map((l) => { return l.trim() });
+
   if (!head.includes(":")) {
     head = `${owner}:${head}`
   }
@@ -62,6 +79,7 @@ export function getParams() {
     base: core.getInput("base", { required: true }),
     autoMerge: core.getBooleanInput("automerge", { required: true }),
     token: core.getInput("token", { required: true }),
+    labels: labels,
   };
 }
 
