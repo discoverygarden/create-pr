@@ -20,12 +20,6 @@ export async function run() {
       ...pullLocation,
       title: title,
     });
-    while (newPr.mergeable === null) {
-      ({ data: newPr } = await octokit.rest.pulls.get({
-        ...pullLocation,
-        pull_number: newPr.number,
-      }));
-    }
 
     core.info(`Created pull request: ${newPr.html_url}`);
     core.setOutput("number", newPr.number);
@@ -43,6 +37,13 @@ export async function run() {
       )
     } else {
       core.debug("No labels to add")
+    }
+
+    while (newPr.mergeable === null) {
+      ({ data: newPr } = await octokit.rest.pulls.get({
+        ...pullLocation,
+        pull_number: newPr.number,
+      }));
     }
 
     if (!autoMerge) {

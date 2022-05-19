@@ -65,9 +65,6 @@ function run() {
                 return;
             }
             let { data: newPr } = yield octokit.rest.pulls.create(Object.assign(Object.assign({}, pullLocation), { title: title }));
-            while (newPr.mergeable === null) {
-                ({ data: newPr } = yield octokit.rest.pulls.get(Object.assign(Object.assign({}, pullLocation), { pull_number: newPr.number })));
-            }
             core.info(`Created pull request: ${newPr.html_url}`);
             core.setOutput("number", newPr.number);
             core.setOutput("url", newPr.html_url);
@@ -82,6 +79,9 @@ function run() {
             }
             else {
                 core.debug("No labels to add");
+            }
+            while (newPr.mergeable === null) {
+                ({ data: newPr } = yield octokit.rest.pulls.get(Object.assign(Object.assign({}, pullLocation), { pull_number: newPr.number })));
             }
             if (!autoMerge) {
                 core.info("Auto merge is disabled the pull request will not be merged.");
