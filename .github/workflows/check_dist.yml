@@ -17,6 +17,6 @@ jobs:
       - run: npm run package
       - run: |
           if [[ $(git status --porcelain) ]]; then
-            echo 
             echo '::error ::`dist` changed, please update dist by running `npm run package`'
+            exit 1
           fi
