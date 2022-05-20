@@ -65,13 +65,14 @@ export async function run() {
 
 export function getParams() {
   const [owner, repo] = core.getInput("repo", { required: true }).split("/");
+
   let head = core.getInput("head", { required: true });
-
-  const labels = core.getInput("labels").split(",").map((l) => { return l.trim() });
-
   if (!head.includes(":")) {
     head = `${owner}:${head}`
   }
+
+  const labels = core.getInput("labels").split(",").map((l) => { return l.trim() });
+
   return {
     title: core.getInput("title", { required: true }),
     owner: owner,
