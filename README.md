@@ -1,5 +1,5 @@
 # Create Pull Request
-![Test Worflow](https://github.com/discoverygarden/create-pr/actions/workflows/test.yml/badge.svg)
+[![Test](https://github.com/discoverygarden/create-pr/actions/workflows/test.yml/badge.svg)](https://github.com/discoverygarden/create-pr/actions/workflows/test.yml)
 
 Workflow for creating and automatically merging pull requests.
 
