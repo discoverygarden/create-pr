@@ -16,7 +16,7 @@ inputs:
   labels:
     description: A comma seperated list of labels to add to the pull request.
   automerge:
-    description: True if the pull request should be mergd automatically.
+    description: True if the pull request should be merged automatically.
     default: true
   token:
     description: GitHub access token.
