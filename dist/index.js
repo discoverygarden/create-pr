@@ -50,30 +50,46 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.run = void 0;
+exports.getParams = exports.run = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const _a = getParams(), { title, autoMerge, token } = _a, pullLocation = __rest(_a, ["title", "autoMerge", "token"]);
+            const _a = getParams(), { title, autoMerge, token, labels } = _a, pullLocation = __rest(_a, ["title", "autoMerge", "token", "labels"]);
+            core.debug(JSON.stringify(pullLocation));
             const octokit = github.getOctokit(token);
             const { data: openPrs } = yield octokit.rest.pulls.list(Object.assign(Object.assign({}, pullLocation), { state: "open" }));
             if (openPrs.length > 0) {
-                core.info("Pull request already exists.");
+                core.info(`Pull request already exists: ${openPrs[0].html_url}`);
                 return;
             }
             let { data: newPr } = yield octokit.rest.pulls.create(Object.assign(Object.assign({}, pullLocation), { title: title }));
+            core.info(`Created pull request: ${newPr.html_url}`);
+            core.setOutput("number", newPr.number);
+            core.setOutput("url", newPr.html_url);
+            if (labels.length > 0) {
+                core.debug(`Adding labels ${labels} to ${newPr.html_url}`);
+                octokit.rest.issues.addLabels({
+                    owner: pullLocation.owner,
+                    repo: pullLocation.repo,
+                    issue_number: newPr.number,
+                    labels: labels,
+                });
+            }
+            else {
+                core.debug("No labels to add");
+            }
             while (newPr.mergeable === null) {
                 ({ data: newPr } = yield octokit.rest.pulls.get(Object.assign(Object.assign({}, pullLocation), { pull_number: newPr.number })));
             }
-            core.setOutput("number", newPr.number);
-            core.setOutput("url", newPr.html_url);
             if (!autoMerge) {
+                core.info("Auto merge is disabled the pull request will not be merged.");
                 return;
             }
             if (newPr.mergeable) {
                 octokit.rest.pulls.merge(Object.assign(Object.assign({}, pullLocation), { pull_number: newPr.number }));
+                core.info("Merged pull request.");
             }
             else {
                 core.setFailed(`Can not merge pull request state is ${newPr.mergeable_state}.`);
@@ -87,17 +103,24 @@ function run() {
 }
 exports.run = run;
 function getParams() {
-    const [owner, repo] = core.getInput("repo", { required: true });
+    const [owner, repo] = core.getInput("repo", { required: true }).split("/");
+    let head = core.getInput("head", { required: true });
+    if (!head.includes(":")) {
+        head = `${owner}:${head}`;
+    }
+    const labels = core.getInput("labels").split(",").map((l) => { return l.trim(); });
     return {
         title: core.getInput("title", { required: true }),
         owner: owner,
         repo: repo,
-        head: core.getInput("head", { required: true }),
+        head: head,
         base: core.getInput("base", { required: true }),
         autoMerge: core.getBooleanInput("automerge", { required: true }),
         token: core.getInput("token", { required: true }),
+        labels: labels,
     };
 }
+exports.getParams = getParams;
 run();
 
 

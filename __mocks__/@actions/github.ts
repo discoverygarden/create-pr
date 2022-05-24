@@ -6,6 +6,9 @@ const mockApi = {
       create: jest.fn().mockResolvedValue({}),
       merge: jest.fn().mockResolvedValue({}),
     },
+    issues: {
+      addLabels: jest.fn().mockResolvedValue({}),
+    }
   },
 };
 export const getOctokit = jest.fn().mockImplementation(() => mockApi);

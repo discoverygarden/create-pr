@@ -5,7 +5,7 @@
   "main": "lib/index.js",
   "scripts": {
     "build": "tsc",
-    "package": "ncc build --source-map",
+    "package": "npm run build && ncc build --source-map",
     "lint": "eslint src/**/*.ts",
     "test": "jest"
   },

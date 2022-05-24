@@ -3,7 +3,8 @@ import * as github from "@actions/github";
 
 export async function run() {
   try {
-    const { title, autoMerge, token, ...pullLocation } = getParams();
+    const { title, autoMerge, token, labels, ...pullLocation } = getParams();
+    core.debug(JSON.stringify(pullLocation))
 
     const octokit = github.getOctokit(token);
     const { data: openPrs } = await octokit.rest.pulls.list({
@@ -11,7 +12,7 @@ export async function run() {
       state: "open",
     });
     if (openPrs.length > 0) {
-      core.info("Pull request already exists.");
+      core.info(`Pull request already exists: ${openPrs[0].html_url}`);
       return;
     }
 
@@ -19,6 +20,25 @@ export async function run() {
       ...pullLocation,
       title: title,
     });
+
+    core.info(`Created pull request: ${newPr.html_url}`);
+    core.setOutput("number", newPr.number);
+    core.setOutput("url", newPr.html_url);
+
+    if (labels.length > 0) {
+      core.debug(`Adding labels ${labels} to ${newPr.html_url}`)
+      octokit.rest.issues.addLabels({
+        owner: pullLocation.owner,
+        repo: pullLocation.repo,
+        issue_number: newPr.number,
+        labels: labels,
+      }
+
+      )
+    } else {
+      core.debug("No labels to add")
+    }
+
     while (newPr.mergeable === null) {
       ({ data: newPr } = await octokit.rest.pulls.get({
         ...pullLocation,
@@ -26,14 +46,13 @@ export async function run() {
       }));
     }
 
-    core.setOutput("number", newPr.number);
-    core.setOutput("url", newPr.html_url);
-
     if (!autoMerge) {
+      core.info("Auto merge is disabled the pull request will not be merged.");
       return;
     }
     if (newPr.mergeable) {
       octokit.rest.pulls.merge({ ...pullLocation, pull_number: newPr.number });
+      core.info("Merged pull request.");
     } else {
       core.setFailed(
         `Can not merge pull request state is ${newPr.mergeable_state}.`
@@ -44,16 +63,25 @@ export async function run() {
   }
 }
 
-function getParams() {
-  const [owner, repo] = core.getInput("repo", { required: true });
+export function getParams() {
+  const [owner, repo] = core.getInput("repo", { required: true }).split("/");
+
+  let head = core.getInput("head", { required: true });
+  if (!head.includes(":")) {
+    head = `${owner}:${head}`
+  }
+
+  const labels = core.getInput("labels").split(",").map((l) => { return l.trim() });
+
   return {
     title: core.getInput("title", { required: true }),
     owner: owner,
     repo: repo,
-    head: core.getInput("head", { required: true }),
+    head: head,
     base: core.getInput("base", { required: true }),
     autoMerge: core.getBooleanInput("automerge", { required: true }),
     token: core.getInput("token", { required: true }),
+    labels: labels,
   };
 }
 

@@ -5,14 +5,21 @@ inputs:
     description: Title of the pull request
     required: true
   repo:
+    description: Repository name with owner. (owner/repo)
     default: ${{ github.repository }}
   head:
-    default: ${{ github.ref }}
+    description: Head branch to merge.
+    default: ${{ github.ref_name }}
   base:
-    required: true
+    description: Base branch to merge into.
+    default: ${{ github.event.repository.default_branch }}
+  labels:
+    description: A comma seperated list of labels to add to the pull request.
   automerge:
+    description: True if the pull request should be merged automatically.
     default: true
   token:
+    description: GitHub access token.
     required: true
 outputs:
   number:
