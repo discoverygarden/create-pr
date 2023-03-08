@@ -108,7 +108,7 @@ function getParams() {
     if (!head.includes(":")) {
         head = `${owner}:${head}`;
     }
-    let labels;
+    let labels = [];
     if (core.getInput("labels")) {
         labels = core.getInput("labels").trim().split(",").map((l) => { return l.trim(); });
     }

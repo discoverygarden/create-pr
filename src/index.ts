@@ -69,7 +69,7 @@ export function getParams() {
     head = `${owner}:${head}`
   }
 
-  let labels;
+  let labels:string[] = [];
   if (core.getInput("labels")) {
     labels = core.getInput("labels").trim().split(",").map((l) => { return l.trim() });
   }
