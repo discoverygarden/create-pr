@@ -25,18 +25,14 @@ export async function run() {
     core.setOutput("number", newPr.number);
     core.setOutput("url", newPr.html_url);
 
-    core.debug(`Labels Length: ${labels.length}`);
-
-    if (labels instanceof Map && labels.length > 0) {
+    if (Array.isArray(labels) && labels.length > 0) {
       core.debug(`Adding labels ${labels} to ${newPr.html_url}`)
       octokit.rest.issues.addLabels({
         owner: pullLocation.owner,
         repo: pullLocation.repo,
         issue_number: newPr.number,
         labels: labels,
-      }
-
-      )
+      });
     } else {
       core.debug("No labels to add")
     }
