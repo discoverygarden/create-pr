@@ -69,7 +69,10 @@ export function getParams() {
     head = `${owner}:${head}`
   }
 
-  const labels = core.getInput("labels").trim().split(",").map((l) => { return l.trim() });
+  let labels;
+  if (core.getInput("labels")) {
+    labels = core.getInput("labels").trim().split(",").map((l) => { return l.trim() });
+  }
 
   return {
     title: core.getInput("title", { required: true }),
