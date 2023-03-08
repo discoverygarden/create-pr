@@ -25,7 +25,7 @@ export async function run() {
     core.setOutput("number", newPr.number);
     core.setOutput("url", newPr.html_url);
 
-    if (Array.isArray(labels) && labels.length > 0) {
+    if (labels.length > 0) {
       core.debug(`Adding labels ${labels} to ${newPr.html_url}`)
       octokit.rest.issues.addLabels({
         owner: pullLocation.owner,
