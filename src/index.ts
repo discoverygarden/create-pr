@@ -32,9 +32,7 @@ export async function run() {
         repo: pullLocation.repo,
         issue_number: newPr.number,
         labels: labels,
-      }
-
-      )
+      });
     } else {
       core.debug("No labels to add")
     }
@@ -71,7 +69,10 @@ export function getParams() {
     head = `${owner}:${head}`
   }
 
-  const labels = core.getInput("labels").split(",").map((l) => { return l.trim() });
+  let labels:string[] = [];
+  if (core.getInput("labels")) {
+    labels = core.getInput("labels").trim().split(",").map((l) => { return l.trim() });
+  }
 
   return {
     title: core.getInput("title", { required: true }),
