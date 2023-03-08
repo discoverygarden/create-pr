@@ -25,7 +25,9 @@ export async function run() {
     core.setOutput("number", newPr.number);
     core.setOutput("url", newPr.html_url);
 
-    if (labels.length > 0) {
+    core.debug(`Labels Length: ${labels.length}`);
+
+    if (labels instanceof Map && labels.length > 0) {
       core.debug(`Adding labels ${labels} to ${newPr.html_url}`)
       octokit.rest.issues.addLabels({
         owner: pullLocation.owner,
@@ -71,7 +73,7 @@ export function getParams() {
     head = `${owner}:${head}`
   }
 
-  const labels = core.getInput("labels").split(",").map((l) => { return l.trim() });
+  const labels = core.getInput("labels").trim().split(",").map((l) => { return l.trim() });
 
   return {
     title: core.getInput("title", { required: true }),
