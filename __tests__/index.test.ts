@@ -162,4 +162,17 @@ describe("getParams", () => {
 
     expect(getParams().labels).toEqual(["label 1", "label 2"]);
   });
+
+  it("returns empty array if no labels are set on input", () => {
+    const inputs: { [key: string]: string } = {
+      labels: "",
+    };
+    jest
+      .spyOn(core, "getInput")
+      .mockImplementation((id: string, ...params) =>
+        id in inputs ? inputs[id] : "-"
+      );
+
+    expect(getParams().labels).toEqual([]);
+  });
 });
