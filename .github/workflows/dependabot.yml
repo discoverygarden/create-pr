@@ -1,0 +1,22 @@
+---
+name: Dependabot Pull-Request Ticket
+on: pull_request
+
+jobs:
+  dependabot:
+    runs-on: ubuntu-latest
+    if: ${{ github.actor == 'dependabot[bot]' }}
+    steps:
+      - name: Create Issue
+        uses: discoverygarden/create-issue@v1
+        with:
+          project: SEC
+          summary: "[${{ github.repository }}] Workflow version update"
+          description: |
+            Update to github actions workflow.
+          transition: "Request QA Review"
+          deployment-instructions: "N/A"
+          jira-url: ${{ secrets.JIRA_BASE_URL }}
+          jira-user: ${{ secrets.JIRA_USER_EMAIL }}
+          jira-token: ${{ secrets.JIRA_API_TOKEN }}
+          slack-webhook: ${{ secrets.FEED_WORKFLOW_WEBHOOK }}
