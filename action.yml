@@ -27,5 +27,5 @@ outputs:
   url:
     description: Url of the pull  request.
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'dist/index.js'
